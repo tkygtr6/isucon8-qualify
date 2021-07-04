@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -xe
 
 function clean_log() {
 	log_path=$1
