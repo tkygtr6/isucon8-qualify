@@ -5,9 +5,10 @@ DB_DIR="$ROOT_DIR/db"
 BENCH_DIR="$ROOT_DIR/bench"
 
 export MYSQL_PWD=isucon
+export REMOTE_HOST=server3
 
-mysql -uisucon -e "DROP DATABASE IF EXISTS torb; CREATE DATABASE torb;"
-mysql -uisucon torb < "$DB_DIR/schema.sql"
+mysql -h $REMOTE_HOST -uisucon -e "DROP DATABASE IF EXISTS torb; CREATE DATABASE torb;"
+mysql -h $REMOTE_HOST -uisucon torb < "$DB_DIR/schema.sql"
 
 if [ ! -f "$DB_DIR/isucon8q-initial-dataset.sql.gz" ]; then
   echo "Run the following command beforehand." 1>&2
@@ -15,6 +16,6 @@ if [ ! -f "$DB_DIR/isucon8q-initial-dataset.sql.gz" ]; then
   exit 1
 fi
 
-mysql -uisucon torb -e 'ALTER TABLE reservations DROP KEY event_id_and_sheet_id_idx'
-gzip -dc "$DB_DIR/isucon8q-initial-dataset.sql.gz" | mysql -uisucon torb
-mysql -uisucon torb -e 'ALTER TABLE reservations ADD KEY event_id_and_sheet_id_idx (event_id, sheet_id)'
+mysql -h $REMOTE_HOST -uisucon torb -e 'ALTER TABLE reservations DROP KEY event_id_and_sheet_id_idx'
+gzip -dc "$DB_DIR/isucon8q-initial-dataset.sql.gz" | mysql -h $REMOTE_HOST -uisucon torb
+mysql -h $REMOTE_HOST -uisucon torb -e 'ALTER TABLE reservations ADD KEY event_id_and_sheet_id_idx (event_id, sheet_id)'
