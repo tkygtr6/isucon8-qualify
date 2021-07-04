@@ -1,12 +1,18 @@
 #!/bin/bash -xe
+
+SERVER1_HOSTNAME=isucon8-1
+SERVER2_HOSTNAME=isucon8-2
+SERVER3_HOSTNAME=isucon8-3
+
 echo "Deploying server3"
-ssh isucon8-3 "cd /home/isucon/torb && git pull"
-ssh isucon8-3 /home/isucon/torb/scripts/deploy.sh server3
+ssh $SERVER3_HOSTNAME "cd /home/isucon/torb && git pull"
+ssh $SERVER3_HOSTNAME /home/isucon/torb/scripts/deploy.sh server3
 
 echo "Deploying server2"
-ssh isucon8-2 "cd /home/isucon/torb && git pull"
-ssh isucon8-2 /home/isucon/torb/scripts/deploy.sh server2
+ssh $SERVER2_HOSTNAME "cd /home/isucon/torb && git pull"
+ssh $SERVER2_HOSTNAME /home/isucon/torb/scripts/deploy.sh server2
 
 echo "Deploying server1"
-ssh isucon8-1 "cd /home/isucon/torb && git pull"
-ssh isucon8-1 /home/isucon/torb/scripts/deploy.sh server1
+ssh $SERVER1_HOSTNAME "cd /home/isucon/torb && git pull"
+ssh $SERVER1_HOSTNAME /home/isucon/torb/scripts/deploy.sh server1
+
