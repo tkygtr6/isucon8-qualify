@@ -12,7 +12,7 @@ cd /home/isucon/torb
 git pull
 
 if [ $1 == "server1" ]; then
-	clean_log /var/log/nginx/access.log
+	sudo clean_log /var/log/nginx/access.log
 	sudo nginx -s stop
 	sudo nginx
 fi
@@ -22,8 +22,8 @@ if [ $1 == "server2" ]; then
 fi
 
 if [ $1 == "server3" ]; then
-	clean_log /var/log/mariadb/mysql.log
-	clean_log /var/log/mariadb/mysql-slow.sql
+	sudo clean_log /var/log/mariadb/mysql.log
+	sudo clean_log /var/log/mariadb/mysql-slow.sql
 	sudo systemctl restart mariadb
 fi
 
