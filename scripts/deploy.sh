@@ -4,7 +4,7 @@ set -xe
 function clean_log() {
 	log_path=$1
 	if [ -f $log_path ]; then
-		sudo mv $log_path $log_path.$(date "+%Y%m%d_%H%M%S")
+		mv $log_path $log_path.$(date "+%Y%m%d_%H%M%S")
 	fi
 }
 
@@ -12,9 +12,9 @@ cd /home/isucon/torb
 git pull
 
 if [ $1 == "isucon-server1" ]; then
-	sudo clean_log /var/log/nginx/access.log
-	sudo nginx -s stop
-	sudo nginx
+	clean_log /var/log/nginx/access.log
+	nginx -s stop
+	nginx
 fi
 
 if [ $1 == "isucon-server2" ]; then
@@ -22,8 +22,8 @@ if [ $1 == "isucon-server2" ]; then
 fi
 
 if [ $1 == "isucon-server3" ]; then
-	sudo clean_log /var/log/mariadb/mysql.log
-	sudo clean_log /var/log/mariadb/mysql-slow.sql
-	sudo systemctl restart mariadb
+	clean_log /var/log/mariadb/mysql.log
+	clean_log /var/log/mariadb/mysql-slow.sql
+	systemctl restart mariadb
 fi
 
