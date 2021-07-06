@@ -5,7 +5,7 @@ DB_DIR="$ROOT_DIR/db"
 BENCH_DIR="$ROOT_DIR/bench"
 
 export MYSQL_PWD=isucon
-export REMOTE_HOST=isucon8-3
+export REMOTE_HOST=isucon-server3
 
 mysql -h $REMOTE_HOST -uisucon -e "DROP DATABASE IF EXISTS torb; CREATE DATABASE torb;"
 mysql -h $REMOTE_HOST -uisucon torb < "$DB_DIR/schema.sql"

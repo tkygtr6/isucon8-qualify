@@ -11,17 +11,17 @@ function clean_log() {
 cd /home/isucon/torb
 git pull
 
-if [ $1 == "server1" ]; then
+if [ $1 == "isucon-server1" ]; then
 	sudo clean_log /var/log/nginx/access.log
 	sudo nginx -s stop
 	sudo nginx
 fi
 
-if [ $1 == "server2" ]; then
+if [ $1 == "isucon-server2" ]; then
 	sudo systemctl restart torb.python
 fi
 
-if [ $1 == "server3" ]; then
+if [ $1 == "isucon-server3" ]; then
 	sudo clean_log /var/log/mariadb/mysql.log
 	sudo clean_log /var/log/mariadb/mysql-slow.sql
 	sudo systemctl restart mariadb
