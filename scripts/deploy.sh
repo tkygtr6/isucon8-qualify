@@ -13,8 +13,7 @@ git pull
 
 if [ $1 == "isucon-server1" ]; then
 	clean_log /var/log/nginx/access.log
-	nginx -s stop
-	nginx
+	nginx -s stop && sleep 1 && nginx
 fi
 
 if [ $1 == "isucon-server2" ]; then
