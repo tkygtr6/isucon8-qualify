@@ -8,9 +8,6 @@ function clean_log() {
 	fi
 }
 
-cd /home/isucon/torb
-git pull
-
 if [ $1 == "isucon-server1" ]; then
 	clean_log /var/log/nginx/access.log
 	nginx -s stop || true
