@@ -104,7 +104,7 @@ def get_events(filter=lambda e: True):
         event_ids = [row['id'] for row in rows if filter(row)]
         events = []
         for event_id in event_ids:
-            event = get_event_with_detail(event_id)
+            event = get_event(event_id)
             events.append(event)
         conn.commit()
     except MySQLdb.Error as e:
@@ -330,7 +330,7 @@ def get_users(user_id):
         [user['id']])
     recent_reservations = []
     for row in cur.fetchall():
-        event = get_event_with_detail(row['event_id'])
+        event = get_event(row['event_id'])
         price = event['sheets'][row['sheet_rank']]['price']
         del event['sheets']
         del event['total']
@@ -588,7 +588,7 @@ def post_event_edit(event_id):
     closed = flask.request.json['closed'] if 'closed' in flask.request.json.keys() else False
     if closed: public = False
 
-    event = get_event_with_detail(event_id)
+    event = get_event(event_id)
     if not event:
         return res_error("not_found", 404)
 
