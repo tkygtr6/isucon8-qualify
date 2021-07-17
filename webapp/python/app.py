@@ -129,7 +129,7 @@ sheet_total_dict = {
 
 def fetch_num_sheet_between_sheet_id(event_id, first_id, last_id):
     cur = dbh().cursor()
-    cur.execute("select count(*) as count from reservations where canceled_at IS NULL and event_id= %s and sheet_id between %s and %s", [event_id + 1, first_id, last_id])
+    cur.execute("select count(*) as count from reservations where canceled_at IS NULL and event_id= %s and sheet_id between %s and %s", [event_id, first_id + 1, last_id])
     reserved = cur.fetchone()
     return reserved['count']
 
