@@ -143,6 +143,32 @@ def fetch_num_sheet_reserved_by_rank(event_id, rank):
 
     raise Exception(f"rank {rank} not allowed")
 
+def get_event(event_id, login_user_id=None):
+    cur = dbh().cursor()
+    cur.execute("SELECT * FROM events WHERE id = %s", [event_id])
+    event = cur.fetchone()
+    if not event: return None
+
+    event["total"] = sheet_total_dict()
+
+    event["sheets"] = {}
+    for rank in ["S", "A", "B", "C"]:
+        event["sheets"][rank] = {
+            'total': sheet_total_dict[rank],
+            'remains': sheet_total_dict[rank] - fetch_num_sheet_reserved_by_rank(event_id, rank),
+            'price': sheet_price_dict[rank]
+        }
+
+    event["remains"] = 0
+    for rank in ["S", "A", "B", "C"]:
+        event["remains"] += event["sheets"][rank]["remains"]
+
+    event['public'] = True if event['public_fg'] else False
+    event['closed'] = True if event['closed_fg'] else False
+    del event['public_fg']
+    del event['closed_fg']
+
+    return event
 
 def get_event_with_detail(event_id, login_user_id=None):
     cur = dbh().cursor()
