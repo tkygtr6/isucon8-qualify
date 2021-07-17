@@ -149,7 +149,7 @@ def get_event(event_id, login_user_id=None):
     event = cur.fetchone()
     if not event: return None
 
-    event["total"] = sheet_total_dict()
+    event["total"] = sheet_total_dict["all"]
 
     event["sheets"] = {}
     for rank in ["S", "A", "B", "C"]:
