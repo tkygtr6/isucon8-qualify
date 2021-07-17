@@ -156,7 +156,7 @@ def get_event(event_id, login_user_id=None):
         event["sheets"][rank] = {
             'total': sheet_total_dict[rank],
             'remains': sheet_total_dict[rank] - fetch_num_sheet_reserved_by_rank(event_id, rank),
-            'price': sheet_price_dict[rank]
+            'price': sheet_price_dict[rank] + event["price"]
         }
 
     event["remains"] = 0
