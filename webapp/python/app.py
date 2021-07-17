@@ -94,7 +94,6 @@ def teardown(error):
     if hasattr(flask.g, "db"):
         flask.g.db.close()
 
-
 def get_events(filter=lambda e: True):
     conn = dbh()
     conn.autocommit(False)
@@ -105,9 +104,7 @@ def get_events(filter=lambda e: True):
         event_ids = [row['id'] for row in rows if filter(row)]
         events = []
         for event_id in event_ids:
-            event = get_event(event_id)
-            for sheet in event['sheets'].values():
-                del sheet['detail']
+            event = get_event_with_detail(event_id)
             events.append(event)
         conn.commit()
     except MySQLdb.Error as e:
@@ -115,8 +112,39 @@ def get_events(filter=lambda e: True):
         raise e
     return events
 
+sheet_price_dict = {
+    'S': 5000,
+    'A': 3000,
+    'B': 1000,
+    'C': 0,
+}
 
-def get_event(event_id, login_user_id=None):
+sheet_total_dict = {
+    'S': 50,
+    'A': 150,
+    'B': 300,
+    'C': 500,
+    'all': 1000
+}
+
+def fetch_num_sheet_between_sheet_id(event_id, first_id, last_id):
+    cur = dbh().cursor()
+    cur.execute("select count(*) as count from reservations where canceled_at IS NULL and event_id= %s and sheet_id between %s and %s", [event_id + 1, first_id, last_id])
+    reserved = cur.fetchone()
+    return reserved['count']
+
+def fetch_num_sheet_reserved_by_rank(event_id, rank):
+    last_id = 0
+    for target_rank in ['S', 'A', 'B', 'C']:
+        first_id = last_id
+        last_id += sheet_total_dict[target_rank]
+        if rank == target_rank:
+            return fetch_num_sheet_between_sheet_id(event_id, first_id, last_id)
+
+    raise Exception(f"rank {rank} not allowed")
+
+
+def get_event_with_detail(event_id, login_user_id=None):
     cur = dbh().cursor()
     cur.execute("SELECT * FROM events WHERE id = %s", [event_id])
     event = cur.fetchone()
@@ -276,7 +304,7 @@ def get_users(user_id):
         [user['id']])
     recent_reservations = []
     for row in cur.fetchall():
-        event = get_event(row['event_id'])
+        event = get_event_with_detail(row['event_id'])
         price = event['sheets'][row['sheet_rank']]['price']
         del event['sheets']
         del event['total']
@@ -311,8 +339,6 @@ def get_users(user_id):
     recent_events = []
     for row in rows:
         event = get_event(row['event_id'])
-        for sheet in event['sheets'].values():
-            del sheet['detail']
         recent_events.append(event)
     user['recent_events'] = recent_events
 
@@ -356,8 +382,8 @@ def get_events_api():
 @app.route('/api/events/<int:event_id>')
 def get_events_by_id(event_id):
     user = get_login_user()
-    if user: event = get_event(event_id, user['id'])
-    else: event = get_event(event_id)
+    if user: event = get_event_with_detail(event_id, user['id'])
+    else: event = get_event_with_detail(event_id)
 
     if not event or not event["public"]:
         return res_error("not_found", 404)
@@ -517,13 +543,13 @@ def post_admin_events_api():
     except MySQLdb.Error as e:
         conn.rollback()
         print(e)
-    return jsonify(get_event(event_id))
+    return jsonify(get_event_with_detail(event_id))
 
 
 @app.route('/admin/api/events/<int:event_id>')
 @admin_login_required
 def get_admin_events_by_id(event_id):
-    event = get_event(event_id)
+    event = get_event_with_detail(event_id)
     if not event:
         return res_error("not_found", 404)
     return jsonify(event)
@@ -536,7 +562,7 @@ def post_event_edit(event_id):
     closed = flask.request.json['closed'] if 'closed' in flask.request.json.keys() else False
     if closed: public = False
 
-    event = get_event(event_id)
+    event = get_event_with_detail(event_id)
     if not event:
         return res_error("not_found", 404)
 
@@ -555,7 +581,7 @@ def post_event_edit(event_id):
         conn.commit()
     except MySQLdb.Error as e:
         conn.rollback()
-    return jsonify(get_event(event_id))
+    return jsonify(get_event_with_detail(event_id))
 
 
 @app.route('/admin/api/reports/events/<int:event_id>/sales')
